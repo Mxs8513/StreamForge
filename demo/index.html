@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StreamForge Demo</title>
+  <style>
+    :root { --bg:#090b10; --panel:#121620; --line:#283042; --text:#f7f8fb; --muted:#9aa6bb; --purple:#8b5cf6; --green:#31c48d; --red:#f05252; --cyan:#38bdf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; overflow:hidden; color:var(--text); background:radial-gradient(circle at 85% 0%,#1d1734 0,transparent 32%),var(--bg); font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    header { height:104px; display:flex; align-items:center; justify-content:space-between; padding:0 56px; border-bottom:1px solid var(--line); background:rgba(9,11,16,.82); }
+    .brand { display:flex; align-items:center; gap:18px; }
+    .mark { width:48px; height:48px; display:grid; place-items:center; border-radius:8px; background:var(--purple); font-weight:800; }
+    h1 { margin:0; font-size:28px; letter-spacing:0; }
+    .subtitle { color:var(--muted); font-size:15px; margin-top:3px; }
+    nav { display:flex; gap:8px; }
+    nav button { border:1px solid var(--line); color:var(--muted); background:#10131b; border-radius:6px; padding:10px 15px; font-weight:650; font-size:14px; }
+    nav button.active { color:#fff; border-color:var(--purple); background:#251b42; }
+    main { position:relative; height:calc(100vh - 104px); }
+    .scene { position:absolute; inset:0; padding:48px 64px 56px; opacity:0; transform:translateY(20px); pointer-events:none; transition:opacity .55s ease,transform .55s ease; }
+    .scene.active { opacity:1; transform:none; pointer-events:auto; }
+    .eyebrow { color:var(--purple); text-transform:uppercase; font-size:14px; font-weight:800; letter-spacing:.12em; }
+    h2 { font-size:46px; line-height:1.05; margin:10px 0 12px; letter-spacing:0; }
+    .lede { max-width:920px; color:var(--muted); font-size:20px; line-height:1.5; }
+    .flow { display:grid; grid-template-columns:1fr 50px 1.15fr 50px 1fr; align-items:stretch; gap:14px; margin-top:42px; }
+    .box,.card { border:1px solid var(--line); background:linear-gradient(180deg,#151a25,#10141d); border-radius:8px; padding:26px; }
+    .box strong,.card strong { display:block; font-size:19px; margin-bottom:8px; }
+    .box p,.card p { margin:0; color:var(--muted); line-height:1.45; }
+    .arrow { display:grid; place-items:center; color:var(--purple); font-size:30px; }
+    .workers { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px; }
+    .worker { border:1px solid var(--line); background:#0b0e15; border-radius:6px; padding:16px; }
+    .worker span { color:var(--green); font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:34px; }
+    .event { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:16px; line-height:1.65; color:#c9d4e8; }
+    .event b { color:var(--cyan); }
+    table { width:100%; border-collapse:collapse; margin-top:14px; font-size:16px; }
+    th,td { text-align:left; padding:13px 12px; border-bottom:1px solid var(--line); }
+    th { color:var(--muted); font-size:13px; text-transform:uppercase; }
+    .timeline { margin-top:35px; display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+    .tick { position:relative; min-height:150px; border-top:3px solid var(--line); padding:22px 16px 16px; background:#11151e; border-radius:0 0 8px 8px; }
+    .tick::before { content:""; position:absolute; top:-8px; left:16px; width:13px; height:13px; background:var(--purple); border-radius:50%; }
+    .tick.crash { border-top-color:var(--red); } .tick.crash::before { background:var(--red); }
+    .tick.recover { border-top-color:var(--green); } .tick.recover::before { background:var(--green); }
+    .tick b { display:block; font-size:16px; margin-bottom:9px; } .tick p { color:var(--muted); margin:0; line-height:1.4; }
+    .node-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:24px; }
+    .node { border:1px solid var(--line); border-radius:8px; padding:20px; background:#11151e; }
+    .node.dead { border-color:#7f3030; opacity:.72; } .node.live { border-color:#236d55; }
+    .status { display:inline-flex; padding:5px 9px; border-radius:4px; margin-top:12px; font-size:12px; font-weight:800; text-transform:uppercase; }
+    .dead .status { color:#fecaca; background:#451a1a; } .live .status { color:#bbf7d0; background:#123a2e; }
+    .results { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:32px; }
+    .result-head { display:flex; justify-content:space-between; align-items:center; }
+    .pass { color:#bbf7d0; background:#123a2e; border:1px solid #236d55; padding:7px 11px; border-radius:5px; font-weight:800; }
+    .numbers { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:24px; }
+    .number { padding:18px; border:1px solid var(--line); border-radius:7px; background:#0b0e15; }
+    .number b { font-size:30px; color:var(--green); margin:0 0 4px; } .number span { color:var(--muted); }
+    .scope { margin-top:22px; border-left:4px solid var(--purple); padding:15px 18px; background:#171326; color:#c9c2dc; line-height:1.45; }
+    .bench { display:grid; grid-template-columns:1.05fr .95fr; gap:24px; margin-top:30px; }
+    .bars { display:flex; align-items:end; gap:22px; height:300px; padding:22px 24px 0; border:1px solid var(--line); border-radius:8px; background:#10141d; }
+    .bar-wrap { flex:1; height:100%; display:flex; flex-direction:column; justify-content:end; align-items:center; gap:10px; color:var(--muted); }
+    .bar { width:72%; min-height:4px; border-radius:5px 5px 0 0; background:linear-gradient(180deg,var(--purple),#5b35ae); transform-origin:bottom; animation:grow .8s ease both; }
+    .bar-wrap b { color:#fff; font-size:15px; }
+    @keyframes grow { from { transform:scaleY(.1); opacity:.2; } to { transform:scaleY(1); opacity:1; } }
+    .bench-list { display:flex; flex-direction:column; gap:12px; }
+    .bench-row { display:flex; justify-content:space-between; padding:18px 20px; border:1px solid var(--line); border-radius:7px; background:#10141d; }
+    .bench-row span { color:var(--muted); } .bench-row strong { font-size:20px; }
+    .knee { border-color:#754d18; background:#241b0e; }
+    .footer-note { position:absolute; right:64px; bottom:24px; color:#68758b; font-size:13px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="mark">SF</div><div><h1>StreamForge</h1><div class="subtitle">Distributed stream processing engine</div></div></div>
+    <nav>
+      <button data-scene="architecture" class="active">Architecture</button>
+      <button data-scene="processing">Processing</button>
+      <button data-scene="recovery">Recovery</button>
+      <button data-scene="correctness">Correctness</button>
+      <button data-scene="benchmark">Benchmark</button>
+    </nav>
+  </header>
+  <main>
+    <section class="scene active" id="architecture">
+      <div class="eyebrow">Coordinator-managed distribution</div><h2>One stream. Three stateful workers.</h2>
+      <p class="lede">Kafka events are partitioned by key, shuffled over gRPC, aggregated in event-time windows, and committed to object storage only with completed checkpoints.</p>
+      <div class="flow">
+        <div class="box"><strong>Kafka / Redpanda</strong><p>6 partitions<br />Engine-owned offsets<br />Out-of-order events</p></div><div class="arrow">→</div>
+        <div class="box"><strong>Coordinator + worker pool</strong><p>Membership, key-bucket ownership, heartbeats, checkpoint barriers</p><div class="workers"><div class="worker"><span>w0</span><br />0–21</div><div class="worker"><span>w1</span><br />22–42</div><div class="worker"><span>w2</span><br />43–63</div></div></div><div class="arrow">→</div>
+        <div class="box"><strong>Parquet + Iceberg</strong><p>Staged S3 output<br />One snapshot per checkpoint<br />Time-travel queries</p></div>
+      </div>
+    </section>
+    <section class="scene" id="processing">
+      <div class="eyebrow">Stateful event-time processing</div><h2>Every key has one owner and replay-stable windows.</h2>
+      <p class="lede">Workers use event timestamps and watermarks, not wall-clock timing, so replay after a checkpoint maps each event back to the same tumbling window.</p>
+      <div class="grid2">
+        <div class="card"><strong>Incoming Protobuf event</strong><div class="event">{<br />&nbsp;&nbsp;<b>event_id</b>: "evt-18421",<br />&nbsp;&nbsp;<b>key</b>: "user_42",<br />&nbsp;&nbsp;<b>amount</b>: 19.99,<br />&nbsp;&nbsp;<b>event_time</b>: 1718900000123<br />}</div></div>
+        <div class="card"><strong>BadgerDB keyed window state</strong><table><tr><th>Key</th><th>Window</th><th>Count</th><th>Sum</th></tr><tr><td>user_42</td><td>10:00:00–10:00:01</td><td>37</td><td>$742.13</td></tr><tr><td>user_91</td><td>10:00:00–10:00:01</td><td>24</td><td>$318.02</td></tr><tr><td>user_17</td><td>10:00:01–10:00:02</td><td>18</td><td>$201.74</td></tr></table><div class="scope">Watermark = maximum event time seen − allowed lateness. Closed windows are staged under the next checkpoint ID.</div></div>
+      </div>
+    </section>
+    <section class="scene" id="recovery">
+      <div class="eyebrow">Induced worker failure</div><h2>Kill a worker. Restore ownership. Resume from durable offsets.</h2>
+      <p class="lede">The chaos test sends SIGKILL mid-stream. The coordinator detects the missed heartbeats, advances the epoch, and survivors rebuild their new key ranges from checkpoint snapshots.</p>
+      <div class="timeline"><div class="tick"><b>Checkpoint 3</b><p>State, offsets, and staged output committed atomically.</p></div><div class="tick crash"><b>w0 receives SIGKILL</b><p>The worker disappears while events are still arriving.</p></div><div class="tick crash"><b>Heartbeat timeout</b><p>Coordinator declares w0 dead after ~2.5 seconds.</p></div><div class="tick recover"><b>Epoch 2</b><p>Partitions and 64 key buckets are reassigned.</p></div><div class="tick recover"><b>Resume</b><p>w1 and w2 restore owned state and replay the tail.</p></div></div>
+      <div class="node-row"><div class="node dead"><strong>Worker w0</strong><p>Previous key-bucket owner</p><span class="status">Terminated</span></div><div class="node live"><strong>Worker w1</strong><p>Restored from 3 snapshots</p><span class="status">Healthy</span></div><div class="node live"><strong>Worker w2</strong><p>Restored from 3 snapshots</p><span class="status">Healthy</span></div></div>
+    </section>
+    <section class="scene" id="correctness">
+      <div class="eyebrow">Automated reconciliation</div><h2>The guarantee is tested, not asserted.</h2>
+      <p class="lede">A deterministic 20,000-event dataset runs once cleanly and once with a worker crash. The verifier reads only files referenced by completed checkpoints.</p>
+      <div class="results">
+        <div class="card"><div class="result-head"><strong>No-failure run</strong><span class="pass">BIT-EXACT</span></div><div class="numbers"><div class="number"><b>20,000</b><span>events committed</span></div><div class="number"><b>0</b><span>duplicate windows</span></div><div class="number"><b>200</b><span>distinct keys</span></div><div class="number"><b>0</b><span>missing keys</span></div></div></div>
+        <div class="card"><div class="result-head"><strong>Crash + recovery run</strong><span class="pass">PASS</span></div><div class="numbers"><div class="number"><b>20,018</b><span>aggregate count</span></div><div class="number"><b>0</b><span>duplicate windows</span></div><div class="number"><b>200</b><span>distinct keys</span></div><div class="number"><b>0</b><span>keys below baseline</span></div></div><div class="scope">Honest boundary: bit-exact exactly-once without failure; effectively-once under crash with 18 boundary events replayed and zero data loss.</div></div>
+      </div>
+    </section>
+    <section class="scene" id="benchmark">
+      <div class="eyebrow">Measured on a 2-vCPU laptop VM</div><h2>Low latency through 40k events/s, then a visible saturation knee.</h2>
+      <p class="lede">Three workers, 6 Kafka partitions, 64 key buckets, BadgerDB state, staged checkpoints, Prometheus metrics, and Grafana observability enabled.</p>
+      <div class="bench"><div class="bars"><div class="bar-wrap"><b>4,944/s</b><div class="bar" style="height:7%"></div><span>5k injected</span></div><div class="bar-wrap"><b>9,974/s</b><div class="bar" style="height:14%"></div><span>10k</span></div><div class="bar-wrap"><b>19,922/s</b><div class="bar" style="height:28%"></div><span>20k</span></div><div class="bar-wrap"><b>38,535/s</b><div class="bar" style="height:54%"></div><span>40k</span></div><div class="bar-wrap"><b>71,907/s</b><div class="bar" style="height:100%"></div><span>80k</span></div></div>
+        <div class="bench-list"><div class="bench-row"><span>Sustained workload</span><strong>~40k events/s</strong></div><div class="bench-row"><span>p99 at 40k/s</span><strong>24 ms</strong></div><div class="bench-row"><span>1→2 worker scaling</span><strong>2.29×</strong></div><div class="bench-row knee"><span>Saturation at 80k injected</span><strong>450 ms p99</strong></div><div class="bench-row"><span>Backlog-drain peak</span><strong>108,774/s</strong></div></div></div>
+    </section>
+    <div class="footer-note">Source: bench/RESULTS.md and bench/p6_reconciliation_test.sh</div>
+  </main>
+  <script>
+    const buttons = [...document.querySelectorAll('[data-scene]')];
+    function showScene(id) { document.querySelectorAll('.scene').forEach(s => s.classList.toggle('active', s.id === id)); buttons.forEach(b => b.classList.toggle('active', b.dataset.scene === id)); }
+    buttons.forEach(button => button.addEventListener('click', () => showScene(button.dataset.scene)));
+    window.showScene = showScene;
+  </script>
+</body>
+</html>

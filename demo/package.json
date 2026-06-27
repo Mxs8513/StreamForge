@@ -1,0 +1,11 @@
+{
+  "name": "streamforge-demo-recorder",
+  "private": true,
+  "scripts": {
+    "record": "node build-demo.js"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "playwright": "^1.61.1"
+  }
+}

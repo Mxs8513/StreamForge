@@ -2,4 +2,6 @@
 /bin/
 /data/
 /generator
+/demo/node_modules/
+/demo/out/
 
