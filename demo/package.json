@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "lucide": "^1.21.0",
     "playwright": "^1.61.1"
   }
 }

@@ -22,7 +22,8 @@ const server = http.createServer((req, res) => {
     res.writeHead(404);
     return res.end("Not found");
   }
-  res.setHeader("Content-Type", file.endsWith(".html") ? "text/html; charset=utf-8" : "application/octet-stream");
+  const type = file.endsWith(".html") ? "text/html; charset=utf-8" : file.endsWith(".js") ? "text/javascript; charset=utf-8" : "application/octet-stream";
+  res.setHeader("Content-Type", type);
   fs.createReadStream(file).pipe(res);
 });
 function run(args) {
@@ -35,12 +36,12 @@ async function mountOverlay(page) {
     const root = document.createElement("div");
     root.id = "demo-overlay";
     root.style.cssText = "position:fixed;inset:0;z-index:99999;pointer-events:none;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif";
-    root.innerHTML = `<div id="demo-card" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#251b42,#090b10 58%)"><div style="text-align:center"><div style="width:104px;height:104px;margin:0 auto 30px;display:grid;place-items:center;border-radius:12px;background:#8b5cf6;color:white;font-size:38px;font-weight:850">SF</div><div id="demo-title" style="font-size:74px;font-weight:850;color:white">StreamForge</div><div id="demo-subtitle" style="margin-top:16px;font-size:31px;color:#b7c0d1">Fault-Tolerant Distributed Stream Processing</div><div style="width:128px;height:5px;background:#8b5cf6;border-radius:5px;margin:32px auto 0"></div></div></div><div id="demo-step" style="position:absolute;right:28px;top:25px;padding:9px 16px;border-radius:999px;background:rgba(9,11,16,.86);border:1px solid #3a4355;color:#fff;font-size:17px;font-weight:700"></div><div id="demo-caption" style="position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:min(76%,1200px);padding:15px 24px;border-radius:12px;border:1px solid #333b4b;border-left:5px solid #8b5cf6;background:rgba(9,11,16,.92);color:#fff;font-size:22px;line-height:1.3;font-weight:650;text-align:center"></div>`;
+    root.innerHTML = `<div id="demo-card" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background-color:#fbfcfe;background-image:radial-gradient(#dfe5ef 1px,transparent 1px);background-size:20px 20px"><div style="text-align:center"><div style="width:104px;height:104px;margin:0 auto 30px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(135deg,#286cff,#7c3aed);color:white;font-size:52px;font-weight:900;box-shadow:0 16px 40px rgba(76,80,220,.22)">S</div><div id="demo-title" style="font-size:74px;font-weight:900;color:#07132f">StreamForge</div><div id="demo-subtitle" style="margin-top:16px;font-size:31px;color:#53627d;font-weight:650">Distributed Stream Processing, Made Visible</div><div style="width:128px;height:5px;background:linear-gradient(90deg,#1473e6,#7137d8,#078640);border-radius:5px;margin:32px auto 0"></div></div></div><div id="demo-step" style="position:absolute;right:28px;top:25px;padding:9px 16px;border-radius:7px;background:rgba(255,255,255,.96);border:1px solid #d7deea;color:#07132f;box-shadow:0 8px 24px rgba(30,55,90,.08);font-size:17px;font-weight:800"></div><div id="demo-caption" style="position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:min(78%,1260px);padding:15px 24px;border-radius:8px;border:1px solid #d7deea;border-left:5px solid #7137d8;background:rgba(255,255,255,.96);box-shadow:0 10px 30px rgba(30,55,90,.1);color:#07132f;font-size:21px;line-height:1.3;font-weight:750;text-align:center"></div>`;
     document.documentElement.appendChild(root);
     window.setDemoOverlay = ({ card = false, outro = false, step = "", caption = "" }) => {
       document.querySelector("#demo-card").style.display = card ? "flex" : "none";
       document.querySelector("#demo-title").textContent = "StreamForge";
-      document.querySelector("#demo-subtitle").textContent = outro ? "Measured. Recoverable. Defensible." : "Fault-Tolerant Distributed Stream Processing";
+      document.querySelector("#demo-subtitle").textContent = outro ? "Measured. Recoverable. Defensible." : "Distributed Stream Processing, Made Visible";
       document.querySelector("#demo-step").textContent = step;
       document.querySelector("#demo-step").style.display = step ? "block" : "none";
       document.querySelector("#demo-caption").textContent = caption;
@@ -51,23 +52,27 @@ async function mountOverlay(page) {
 
 const scenes = [
   { name: "00-intro", seconds: 3, card: true },
-  { name: "01-architecture", seconds: 6, id: "architecture", step: "1 / 5 · Architecture", caption: "Kafka input is partitioned by key across a coordinator-managed worker pool, then committed to Parquet and Iceberg." },
-  { name: "02-processing", seconds: 6, id: "processing", step: "2 / 5 · Stateful Processing", caption: "Event-time watermarks and keyed BadgerDB state keep window assignment stable when events are replayed." },
-  { name: "03-recovery", seconds: 7, id: "recovery", step: "3 / 5 · Worker Recovery", caption: "The chaos test kills w0 mid-stream. Heartbeats detect the failure, ownership moves, and survivors restore checkpointed state." },
-  { name: "04-correctness", seconds: 7, id: "correctness", step: "4 / 5 · Reconciliation", caption: "The clean run is bit-exact. Under crash, no keys are lost and no window is committed twice; the residual boundary is reported honestly." },
-  { name: "05-benchmark", seconds: 7, id: "benchmark", step: "5 / 5 · Measured Performance", caption: "The engine holds p99 latency to 24 ms at about 40,000 events per second and exposes the saturation knee at higher load." },
-  { name: "06-outro", seconds: 3, card: true, outro: true }
+  { name: "01-overview", seconds: 5, id: "overview", step: "1 / 6 · System Overview", caption: "A replayable Kafka stream enters the engine, stateful workers process it, and completed checkpoints publish lakehouse output." },
+  { name: "02-architecture", seconds: 7, id: "architecture", step: "2 / 6 · Architecture", caption: "The Go coordinator owns assignment, heartbeats, epochs, and checkpoint barriers while three workers own disjoint key ranges." },
+  { name: "03-live-a", seconds: 2.5, id: "live", workerFrame: 0, step: "3 / 6 · Workers Processing", caption: "user_42 hashes to bucket 12, so Worker 1 updates the only authoritative window state for that key." },
+  { name: "04-live-b", seconds: 2.5, id: "live", workerFrame: 1, step: "3 / 6 · Workers Processing", caption: "The next key maps to bucket 37 and crosses the gRPC shuffle to Worker 2." },
+  { name: "05-live-c", seconds: 3, id: "live", workerFrame: 2, step: "3 / 6 · Workers Processing", caption: "All workers reach the barrier; state, offsets, and staged Parquet commit together as checkpoint 42." },
+  { name: "06-recovery", seconds: 7, id: "recovery", step: "4 / 6 · Fault Recovery", caption: "A heartbeat timeout advances the epoch, reassigns ownership, restores state, and resumes from checkpointed offsets." },
+  { name: "07-correctness", seconds: 6, id: "correctness", step: "5 / 6 · Reconciliation", caption: "The clean run is bit-exact. Under crash, no keys are lost and no window is committed twice; the measured boundary stays explicit." },
+  { name: "08-benchmark", seconds: 6, id: "benchmark", step: "6 / 6 · Measured Performance", caption: "The engine holds p99 latency to 24 ms around 40,000 events per second and exposes its saturation knee." },
+  { name: "09-outro", seconds: 3, card: true, outro: true }
 ];
 
 (async () => {
   await new Promise(resolve => server.listen(PORT, "127.0.0.1", resolve));
   const browser = await chromium.launch({ headless: true, args: ["--force-color-profile=srgb", "--hide-scrollbars"] });
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, colorScheme: "dark" });
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, colorScheme: "light" });
   await page.goto(`http://127.0.0.1:${PORT}`, { waitUntil: "networkidle" });
   await mountOverlay(page);
 
   for (const scene of scenes) {
     if (scene.id) await page.evaluate(id => window.showScene(id), scene.id);
+    if (Number.isInteger(scene.workerFrame)) await page.evaluate(index => window.setWorkerFrame(index), scene.workerFrame);
     await page.evaluate(config => window.setDemoOverlay(config), scene);
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(FRAMES, `${scene.name}.png`) });
