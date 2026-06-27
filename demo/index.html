@@ -13,7 +13,7 @@
     .brand-name { font-size:36px; font-weight:850; letter-spacing:0; }
     .brand-sub { color:var(--muted); font-size:15px; font-weight:650; margin-top:2px; }
     main { position:relative; height:calc(100vh - 94px); }
-    .scene { position:absolute; inset:0; padding:26px 56px 108px; opacity:0; pointer-events:none; }
+    .scene { position:absolute; inset:0; padding:26px 56px 108px; opacity:0; pointer-events:none; transition:opacity .32s ease; }
     .scene.active { opacity:1; pointer-events:auto; }
     .title { text-align:center; margin-bottom:24px; }
     .title h2 { margin:0; font-size:32px; line-height:1.08; letter-spacing:0; }
@@ -93,6 +93,40 @@
     .numbers { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-top:22px; }
     .number { padding:16px; border:1px solid var(--line); border-radius:7px; background:#fbfcfe; } .number b { display:block; color:var(--green); font-size:29px; } .number span { color:var(--muted); font-size:13px; }
     .scope { margin-top:18px; padding:14px 16px; border-left:4px solid var(--purple); background:var(--purple-soft); color:#563187; font-size:14px; line-height:1.45; }
+    .terminal-layout { display:grid; grid-template-columns:minmax(0,1fr) 430px; gap:22px; height:650px; }
+    .terminal-window { min-width:0; overflow:hidden; border:1px solid #25334a; border-radius:8px; background:#07111f; box-shadow:0 18px 44px rgba(7,19,47,.2); }
+    .terminal-bar { height:47px; display:flex; align-items:center; padding:0 17px; border-bottom:1px solid #26344a; background:#0e1a2b; color:#9fb0c7; font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .terminal-dots { display:flex; gap:8px; margin-right:17px; }
+    .terminal-dots i { width:11px; height:11px; border-radius:50%; background:#ff5f57; }
+    .terminal-dots i:nth-child(2) { background:#febc2e; } .terminal-dots i:nth-child(3) { background:#28c840; }
+    .terminal-live { margin-left:auto; display:flex; align-items:center; gap:7px; color:#71e59b; }
+    .terminal-live::before { content:""; width:8px; height:8px; border-radius:50%; background:#35d472; box-shadow:0 0 0 5px rgba(53,212,114,.12); animation:pulse 1.2s ease-in-out infinite; }
+    .terminal-output { height:603px; overflow:hidden; padding:18px 21px; color:#c7d2e2; font:500 14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .term-line { min-height:22px; white-space:pre-wrap; overflow-wrap:anywhere; opacity:0; transform:translateY(5px); animation:terminal-in .18s ease forwards; }
+    .term-line.command { color:#f7fbff; font-weight:700; margin:3px 0 7px; } .term-line.command::before { content:"$ "; color:#71e59b; }
+    .term-line.info { color:#83bdf8; } .term-line.worker { color:#c6a8ff; } .term-line.success { color:#71e59b; } .term-line.warn { color:#ffd479; } .term-line.error { color:#ff8888; }
+    .cursor { display:inline-block; width:8px; height:17px; margin-left:3px; vertical-align:-3px; background:#dce6f5; animation:blink .7s steps(1) infinite; }
+    .evidence-panel { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .evidence-card { padding:18px; overflow:hidden; }
+    .evidence-card h3 { display:flex; align-items:center; gap:9px; margin:0 0 13px; font-size:18px; }
+    .evidence-card h3 svg { width:20px; color:var(--purple); }
+    .status-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:10px 0; border-top:1px solid #e8ecf3; color:var(--muted); font-size:13px; }
+    .status-row strong { color:var(--ink); text-align:right; }
+    .worker-status { display:grid; grid-template-columns:46px 1fr auto; align-items:center; gap:10px; padding:11px; margin-top:8px; border:1px solid #d9c8f5; border-radius:7px; background:var(--purple-soft); transition:.25s; }
+    .worker-status b { color:var(--purple); } .worker-status small { color:var(--muted); line-height:1.35; } .worker-status .health { width:9px; height:9px; border-radius:50%; background:#24a55a; box-shadow:0 0 0 4px #dff6e7; }
+    .worker-status.failed { border-color:#ef8d8d; background:var(--red-soft); } .worker-status.failed b { color:#a42828; } .worker-status.failed .health { background:var(--red); box-shadow:0 0 0 4px #ffe0e0; }
+    .object-key { display:flex; align-items:flex-start; gap:9px; padding:8px 0; color:#465571; font:600 12px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace; opacity:.18; transition:.25s; }
+    .object-key::before { content:""; width:7px; height:7px; margin-top:5px; border-radius:50%; background:var(--green); flex:0 0 auto; }
+    .object-key.on { opacity:1; color:#18683a; }
+    .proof-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .proof-metric { padding:13px; border:1px solid var(--line); border-radius:7px; background:#fbfcfe; }
+    .proof-metric b { display:block; color:var(--green); font-size:23px; } .proof-metric span { color:var(--muted); font-size:11px; }
+    .proof-boundary { padding:13px; border-left:4px solid var(--purple); background:var(--purple-soft); color:#563187; font-size:12px; line-height:1.45; }
+    .live-badge { display:inline-flex; align-items:center; gap:7px; padding:6px 9px; border:1px solid #55b77b; border-radius:5px; background:var(--green-soft); color:var(--green); font-size:11px; font-weight:850; text-transform:uppercase; }
+    .live-badge::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--green); }
+    @keyframes terminal-in { to { opacity:1; transform:translateY(0); } }
+    @keyframes blink { 50% { opacity:0; } }
+    @keyframes pulse { 50% { opacity:.45; transform:scale(.8); } }
     .bench { display:grid; grid-template-columns:1.12fr .88fr; gap:24px; margin-top:20px; }
     .chart { height:420px; padding:24px 28px; display:flex; align-items:end; gap:25px; }
     .bar-wrap { flex:1; height:100%; display:flex; flex-direction:column; justify-content:end; align-items:center; gap:9px; color:var(--muted); font-size:13px; }
@@ -134,34 +168,51 @@
       </div>
     </section>
 
-    <section class="scene" id="live">
-      <div class="title"><h2>Live Distributed Run</h2><p>Each event is hashed to one key bucket, routed to its owner, and folded into replay-stable window state.</p></div>
-      <div class="live-layout">
-        <div class="card event-console"><h3><div class="icon icon-blue"><i data-lucide="radio-tower"></i></div>Incoming Event</h3><div class="code">{<br />&nbsp;&nbsp;<b>event_id</b>: <span id="event-id">"evt-18421"</span>,<br />&nbsp;&nbsp;<b>key</b>: <span id="event-key">"user_42"</span>,<br />&nbsp;&nbsp;<b>amount</b>: <span id="event-amount">19.99</span>,<br />&nbsp;&nbsp;<b>event_time</b>: 1718900000123<br />}</div><div class="route" id="route-text">hash(user_42) → bucket 12 → Worker 1</div></div>
-        <div><div class="live-workers">
-          <div class="card live-worker active" data-worker="0"><i class="pulse"></i><div class="worker-head"><div class="icon icon-purple"><i data-lucide="cpu"></i></div><div><h3>Worker 1</h3><div class="partition">Buckets 0–21</div></div></div><div class="worker-count"><span id="count-0">12,482</span><small>events aggregated</small></div><div class="mini-flow"><span><i data-lucide="route"></i>keyBy owner</span><span><i data-lucide="timer"></i>1s tumbling windows</span><span><i data-lucide="database"></i>BadgerDB state</span></div></div>
-          <div class="card live-worker" data-worker="1"><i class="pulse"></i><div class="worker-head"><div class="icon icon-purple"><i data-lucide="cpu"></i></div><div><h3>Worker 2</h3><div class="partition">Buckets 22–42</div></div></div><div class="worker-count"><span id="count-1">11,936</span><small>events aggregated</small></div><div class="mini-flow"><span><i data-lucide="route"></i>keyBy owner</span><span><i data-lucide="timer"></i>1s tumbling windows</span><span><i data-lucide="database"></i>BadgerDB state</span></div></div>
-          <div class="card live-worker" data-worker="2"><i class="pulse"></i><div class="worker-head"><div class="icon icon-purple"><i data-lucide="cpu"></i></div><div><h3>Worker 3</h3><div class="partition">Buckets 43–63</div></div></div><div class="worker-count"><span id="count-2">12,007</span><small>events aggregated</small></div><div class="mini-flow"><span><i data-lucide="route"></i>keyBy owner</span><span><i data-lucide="timer"></i>1s tumbling windows</span><span><i data-lucide="database"></i>BadgerDB state</span></div></div>
-        </div><div class="card checkpoint-bar"><div><strong id="checkpoint-title">Checkpoint 42 preparing</strong><div style="color:var(--muted);margin-top:4px">Sources pause, in-flight work drains, state + offsets snapshot together.</div></div><div class="progress"><i></i></div><span class="chip"><i data-lucide="shield-check"></i><span id="checkpoint-status">3 / 3 workers ready</span></span></div></div>
+    <section class="scene" id="terminal-flow">
+      <div class="title"><h2>Live Event Flow</h2><p>Real Kafka records and worker assignments captured from the 20,000-event chaos run.</p></div>
+      <div class="terminal-layout">
+        <div class="terminal-window"><div class="terminal-bar"><span class="terminal-dots"><i></i><i></i><i></i></span>streamforge / live-event-flow<span class="terminal-live">live trace</span></div><div class="terminal-output" id="flow-output"></div></div>
+        <aside class="evidence-panel">
+          <div class="card evidence-card"><h3><i data-lucide="radio-tower"></i>Run Configuration</h3><div class="status-row"><span>Kafka topic</span><strong>p6-chaos-1782592848</strong></div><div class="status-row"><span>Input rate</span><strong>2,000 events/s</strong></div><div class="status-row"><span>Key cardinality</span><strong>200</strong></div><div class="status-row"><span>Window</span><strong>1 second</strong></div></div>
+          <div class="card evidence-card"><h3><i data-lucide="network"></i>Cluster View</h3><div class="worker-status"><b>w0</b><small>partitions [1 4]<br />21 buckets</small><i class="health"></i></div><div class="worker-status"><b>w1</b><small>partitions [2 5]<br />21 buckets</small><i class="health"></i></div><div class="worker-status"><b>w2</b><small>partitions [0 3]<br />22 buckets</small><i class="health"></i></div></div>
+          <span class="live-badge" id="flow-badge">waiting for Kafka records</span>
+        </aside>
       </div>
     </section>
 
-    <section class="scene" id="recovery">
-      <div class="title"><h2>Fault Recovery Storyboard</h2><p>Crash detected → state restored → work reassigned → processing resumes from checkpointed offsets.</p></div>
-      <div class="storyboard">
-        <div class="card story blue-story"><span class="stage-label blue"><b>1</b>Normal Operation</span><h3>All Workers Healthy</h3><div class="mini-coord">Coordinator · Checkpoint 3 completed</div><div class="mini-workers"><div class="mini-worker">Worker 1</div><div class="mini-worker">Worker 2</div><div class="mini-worker">Worker 3</div></div><div class="checkpoint"><i data-lucide="database"></i><br />State + offsets durable</div><div class="story-note">Three workers process and checkpoint normally.</div></div>
-        <div class="card story purple-story"><span class="stage-label purple"><b>2</b>Crash Detected</span><h3>Heartbeat Timeout</h3><div class="mini-coord">Coordinator · advances to epoch 2</div><div class="mini-workers"><div class="mini-worker">Worker 1</div><div class="mini-worker failed">Worker 2</div><div class="mini-worker">Worker 3</div></div><div class="checkpoint"><i data-lucide="database"></i><br />Last completed checkpoint</div><div class="story-note">SIGKILL lands mid-stream; failure detected in ~2.5s.</div></div>
-        <div class="card story green-story"><span class="stage-label green"><b>3</b>Recover + Rebalance</span><h3>Ownership Restored</h3><div class="mini-coord">Coordinator · reassigns partitions + buckets</div><div class="mini-workers"><div class="mini-worker">Worker 1</div><div class="mini-worker" style="border-color:#55b77b;background:var(--green-soft);color:var(--green)">Recovered</div><div class="mini-worker">Worker 3</div></div><div class="checkpoint"><i data-lucide="rotate-ccw"></i><br />Replay from durable offsets</div><div class="story-note">Zero lost keys and zero duplicate committed windows.</div></div>
+    <section class="scene" id="terminal-checkpoint">
+      <div class="title"><h2>Checkpoint + Staged Commit</h2><p>Sources pause, workers snapshot state and offsets, then one metadata write makes staged Parquet visible.</p></div>
+      <div class="terminal-layout">
+        <div class="terminal-window"><div class="terminal-bar"><span class="terminal-dots"><i></i><i></i><i></i></span>streamforge / checkpoint-3<span class="terminal-live">tailing logs</span></div><div class="terminal-output" id="checkpoint-output"></div></div>
+        <aside class="evidence-panel">
+          <div class="card evidence-card"><h3><i data-lucide="database"></i>MinIO Object Store</h3><div class="object-key" data-object="0">checkpoints/3/w0.snap · 23,945 bytes</div><div class="object-key" data-object="1">checkpoints/3/w1.snap · 41,742 bytes</div><div class="object-key" data-object="2">checkpoints/3/w2.snap · 30,161 bytes</div><div class="object-key" data-object="3">output/p6/staging/3/w0-2.parquet</div><div class="object-key" data-object="4">output/p6/staging/3/w1-2.parquet</div><div class="object-key" data-object="5">output/p6/staging/3/w2-2.parquet</div><div class="object-key" data-object="6">checkpoints/3/metadata.json · COMPLETED</div></div>
+          <div class="card evidence-card"><h3><i data-lucide="shield-check"></i>Commit Barrier</h3><div class="status-row"><span>Prepared</span><strong id="checkpoint-prepared">0 / 3</strong></div><div class="status-row"><span>Worker ACKs</span><strong id="checkpoint-acks">0 / 3</strong></div><div class="status-row"><span>Commit point</span><strong id="checkpoint-state">pending</strong></div></div>
+        </aside>
       </div>
     </section>
 
-    <section class="scene" id="correctness">
-      <div class="title"><h2>Correctness Is Reconciled, Not Asserted</h2><p>The verifier reads only Parquet files referenced by completed checkpoints.</p></div>
-      <div class="results">
-        <div class="card result"><div class="result-head"><h3>No-Failure Run</h3><span class="pass">BIT-EXACT</span></div><div class="numbers"><div class="number"><b>20,000</b><span>events committed</span></div><div class="number"><b>0</b><span>duplicate windows</span></div><div class="number"><b>200</b><span>distinct keys</span></div><div class="number"><b>0</b><span>missing keys</span></div></div></div>
-        <div class="card result"><div class="result-head"><h3>Crash + Recovery Run</h3><span class="pass">PASS</span></div><div class="numbers"><div class="number"><b>20,018</b><span>aggregate count</span></div><div class="number"><b>0</b><span>duplicate windows</span></div><div class="number"><b>200</b><span>distinct keys</span></div><div class="number"><b>0</b><span>keys below baseline</span></div></div><div class="scope"><strong>Measured boundary:</strong> bit-exact exactly-once without failure; effectively-once under crash with 18 replayed boundary events and zero data loss.</div></div>
+    <section class="scene" id="terminal-recovery">
+      <div class="title"><h2>Crash Recovery, Live</h2><p>A real worker is SIGKILLed mid-stream; heartbeats advance the epoch and survivors restore checkpointed state.</p></div>
+      <div class="terminal-layout">
+        <div class="terminal-window"><div class="terminal-bar"><span class="terminal-dots"><i></i><i></i><i></i></span>streamforge / chaos-run<span class="terminal-live">failure injection</span></div><div class="terminal-output" id="recovery-output"></div></div>
+        <aside class="evidence-panel">
+          <div class="card evidence-card"><h3><i data-lucide="activity"></i>Coordinator</h3><div class="status-row"><span>Epoch</span><strong id="recovery-epoch">1</strong></div><div class="status-row"><span>Live workers</span><strong id="recovery-count">3 / 3</strong></div><div class="status-row"><span>Last durable checkpoint</span><strong>#3</strong></div><div class="status-row"><span>Failure detection</span><strong>2.168 s</strong></div></div>
+          <div class="card evidence-card"><h3><i data-lucide="cpu"></i>Ownership</h3><div class="worker-status" id="recovery-w0"><b>w0</b><small>partitions [1 4]<br />21 buckets</small><i class="health"></i></div><div class="worker-status" id="recovery-w1"><b>w1</b><small>partitions [2 5]<br />21 buckets</small><i class="health"></i></div><div class="worker-status" id="recovery-w2"><b>w2</b><small>partitions [0 3]<br />22 buckets</small><i class="health"></i></div></div>
+          <span class="live-badge" id="recovery-badge">cluster healthy</span>
+        </aside>
       </div>
-      <div class="card bottom-callout"><i data-lucide="file-check-2"></i><span>deterministic input</span><i data-lucide="arrow-right"></i><span>induced crash</span><i data-lucide="arrow-right"></i><span>committed output reconciliation</span><i data-lucide="badge-check"></i></div>
+    </section>
+
+    <section class="scene" id="terminal-verify">
+      <div class="title"><h2>Verification Runs in the Terminal</h2><p>The verifier reads only Parquet files referenced by completed checkpoint metadata.</p></div>
+      <div class="terminal-layout">
+        <div class="terminal-window"><div class="terminal-bar"><span class="terminal-dots"><i></i><i></i><i></i></span>streamforge / reconciliation<span class="terminal-live">reading committed output</span></div><div class="terminal-output" id="verify-output"></div></div>
+        <aside class="evidence-panel">
+          <div class="card evidence-card"><h3><i data-lucide="file-check-2"></i>Measured Proof</h3><div class="proof-grid"><div class="proof-metric"><b id="proof-baseline">-</b><span>baseline events</span></div><div class="proof-metric"><b id="proof-chaos">-</b><span>crash-run count</span></div><div class="proof-metric"><b id="proof-duplicates">-</b><span>duplicate windows</span></div><div class="proof-metric"><b id="proof-lost">-</b><span>keys below baseline</span></div></div></div>
+          <div class="card evidence-card"><h3><i data-lucide="badge-check"></i>Result</h3><div class="status-row"><span>No-failure run</span><strong id="proof-clean">running</strong></div><div class="status-row"><span>Crash + recovery</span><strong id="proof-recovery">running</strong></div><div class="status-row"><span>Reconciliation</span><strong id="proof-pass">pending</strong></div></div>
+          <div class="proof-boundary"><strong>Measured boundary:</strong> bit-exact exactly-once without failure. Under this crash run, staged commits lost no keys and committed no window twice, with 17 replayed boundary events.</div>
+        </aside>
+      </div>
     </section>
 
     <section class="scene" id="benchmark">
@@ -173,14 +224,176 @@
   </main>
   <script src="/node_modules/lucide/dist/umd/lucide.min.js"></script>
   <script>
-    const workerFrames = [
-      { id:'evt-18421', key:'user_42', amount:'19.99', bucket:12, worker:0, counts:['12,482','11,936','12,007'], checkpoint:'Checkpoint 42 preparing', status:'3 / 3 workers ready' },
-      { id:'evt-18422', key:'user_91', amount:'48.20', bucket:37, worker:1, counts:['12,511','11,972','12,031'], checkpoint:'Checkpoint 42 snapshotting', status:'State + offsets captured' },
-      { id:'evt-18423', key:'user_17', amount:'7.45', bucket:58, worker:2, counts:['12,544','12,006','12,069'], checkpoint:'Checkpoint 42 completed', status:'Staged Parquet committed' }
-    ];
+    const terminalRuns = {
+      flow: {
+        output: 'flow-output',
+        lines: [
+          { kind:'command', text:'docker exec streamforge-redpanda-1 rpk topic consume p6-chaos-1782592848 -n 3 -o start' },
+          { kind:'info', text:'[15:40:49] generator: eps=2000 keys=200 total=20000 topic=p6-chaos-1782592848' },
+          { kind:'worker', text:'[15:40:49] worker w1 joined epoch 1: partitions=[2 5], buckets=21' },
+          { kind:'worker', text:'[15:40:50] worker w0 joined epoch 1: partitions=[1 4], buckets=21' },
+          { kind:'worker', text:'[15:40:50] worker w2 joined epoch 1: partitions=[0 3], buckets=22', signal:'cluster' },
+          { kind:'success', text:'[coordinator] cluster formed with 3 workers -> epoch 1' },
+          { kind:'info', text:'[kafka] partition=0 offset=0 key=user_193 type=click amount=94.92' },
+          { kind:'info', text:'        event_id=2dd404f1-962c-4c63-ab6d-9b90f973556f' },
+          { kind:'info', text:'[kafka] partition=0 offset=1 key=user_63 type=view amount=13.66' },
+          { kind:'info', text:'        event_id=b6a631f3-1dcc-46ce-8c2c-2cea97df77c4', signal:'events' },
+          { kind:'info', text:'[kafka] partition=0 offset=2 key=user_133 type=view amount=3.47' },
+          { kind:'info', text:'        event_id=b7ca84cd-281a-47b1-85cb-00e2461b1a70' },
+          { kind:'success', text:'[engine] partition offsets advance only after owner delivery succeeds' }
+        ]
+      },
+      checkpoint: {
+        output: 'checkpoint-output',
+        lines: [
+          { kind:'command', text:'tail -f coord-chaos.log chaos-w0.log chaos-w1.log chaos-w2.log' },
+          { kind:'worker', text:'[15:40:53] worker w0: checkpoint 3 prepared (sources paused)', signal:'prep1' },
+          { kind:'worker', text:'[15:40:53] worker w1: checkpoint 3 prepared (sources paused)', signal:'prep2' },
+          { kind:'worker', text:'[15:40:53] worker w2: checkpoint 3 prepared (sources paused)', signal:'prep3' },
+          { kind:'info', text:'[w0] snapshot=23945B offsets={p1:1171 p4:1181} stage=output/p6/staging/3/w0-2.parquet', signal:'ack0' },
+          { kind:'info', text:'[w1] snapshot=41742B offsets={p2:1215 p5:1210} stage=output/p6/staging/3/w1-2.parquet', signal:'ack1' },
+          { kind:'info', text:'[w2] snapshot=30161B offsets={p0:1160 p3:1042} stage=output/p6/staging/3/w2-2.parquet', signal:'ack2' },
+          { kind:'success', text:'[15:40:53] coordinator: checkpoint 3 COMPLETED', signal:'commit' },
+          { kind:'success', text:'             workers=3 partitions=6 staged_files=3 duration=53ms' },
+          { kind:'success', text:'[commit] checkpoints/3/metadata.json now references all staged Parquet files' }
+        ]
+      },
+      recovery: {
+        output: 'recovery-output',
+        lines: [
+          { kind:'command', text:'kill -9 97171  # worker w0, mid-stream', signal:'kill' },
+          { kind:'error', text:'[15:40:54] coordinator: checkpoint aborted: prepare w0 returned EOF' },
+          { kind:'warn', text:'[15:40:56] coordinator: w0 declared DEAD (unseen 2.168s)', signal:'dead' },
+          { kind:'warn', text:'[coordinator] epoch 1 -> 2; live workers=2; rebalance partitions and buckets' },
+          { kind:'worker', text:'[w1] resetting to epoch 2: partitions=[1 3 5], buckets=32', signal:'w1' },
+          { kind:'worker', text:'[w1] restored checkpoint 3; resume offsets={p1:1171 p3:1042 p5:1210}' },
+          { kind:'worker', text:'[w2] resetting to epoch 2: partitions=[0 2 4], buckets=32', signal:'w2' },
+          { kind:'worker', text:'[w2] restored checkpoint 3; resume offsets={p0:1160 p2:1215 p4:1181}' },
+          { kind:'success', text:'[15:40:57] coordinator: checkpoint 6 COMPLETED (workers=2, partitions=6, 35ms)', signal:'resumed' },
+          { kind:'success', text:'[15:40:59] generator: produced target 20000 events' }
+        ]
+      },
+      verify: {
+        output: 'verify-output',
+        lines: [
+          { kind:'command', text:'bin/verify --committed' },
+          { kind:'info', text:'source:                      committed checkpoints (34)' },
+          { kind:'info', text:'parquet files:               11' },
+          { kind:'success', text:'total events counted:        20017', signal:'chaos' },
+          { kind:'success', text:'distinct keys:               200' },
+          { kind:'success', text:'distinct (key,window) rows:  2141' },
+          { kind:'success', text:'duplicate (key,window) rows: 0', signal:'duplicates' },
+          { kind:'command', text:'make p6-test  # compare deterministic baseline and crash rollups' },
+          { kind:'info', text:'baseline (no failure): 200 keys, 20000 events, duplicate windows=0', signal:'baseline' },
+          { kind:'info', text:'chaos (crash+recover): 200 keys, 20017 events, duplicate windows=0' },
+          { kind:'success', text:'no-failure exactly-once (bit-exact): OK', signal:'clean' },
+          { kind:'success', text:'under crash: missing_keys=0 keys_below_baseline=0 duplicate_windows=0', signal:'lost' },
+          { kind:'warn', text:'aggregate_overcount=17 (tolerance=100); replay boundary remains explicit' },
+          { kind:'success', text:'EXIT TEST PASS: staged-commit recovery loses ZERO data', signal:'pass' },
+          { kind:'success', text:'0 duplicate windows; every key meets or exceeds baseline' }
+        ]
+      }
+    };
+
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     function showScene(id) { document.querySelectorAll('.scene').forEach(s => s.classList.toggle('active',s.id===id)); }
-    function setWorkerFrame(index) { const f=workerFrames[index]; document.querySelector('#event-id').textContent=`"${f.id}"`; document.querySelector('#event-key').textContent=`"${f.key}"`; document.querySelector('#event-amount').textContent=f.amount; document.querySelector('#route-text').textContent=`hash(${f.key}) → bucket ${f.bucket} → Worker ${f.worker+1}`; document.querySelectorAll('.live-worker').forEach((el,i)=>el.classList.toggle('active',i===f.worker)); f.counts.forEach((count,i)=>document.querySelector(`#count-${i}`).textContent=count); document.querySelector('#checkpoint-title').textContent=f.checkpoint; document.querySelector('#checkpoint-status').textContent=f.status; }
-    window.showScene=showScene; window.setWorkerFrame=setWorkerFrame; lucide.createIcons();
+
+    function resetTerminal(mode) {
+      document.querySelector(`#${terminalRuns[mode].output}`).replaceChildren();
+      if (mode === 'flow') document.querySelector('#flow-badge').textContent = 'waiting for Kafka records';
+      if (mode === 'checkpoint') {
+        document.querySelectorAll('.object-key').forEach(el => el.classList.remove('on'));
+        document.querySelector('#checkpoint-prepared').textContent = '0 / 3';
+        document.querySelector('#checkpoint-acks').textContent = '0 / 3';
+        document.querySelector('#checkpoint-state').textContent = 'pending';
+      }
+      if (mode === 'recovery') {
+        document.querySelector('#recovery-epoch').textContent = '1';
+        document.querySelector('#recovery-count').textContent = '3 / 3';
+        document.querySelector('#recovery-badge').textContent = 'cluster healthy';
+        ['w0','w1','w2'].forEach((id, index) => {
+          const el = document.querySelector(`#recovery-${id}`);
+          el.classList.remove('failed');
+          el.querySelector('small').innerHTML = `${index === 0 ? 'partitions [1 4]<br />21' : index === 1 ? 'partitions [2 5]<br />21' : 'partitions [0 3]<br />22'} buckets`;
+        });
+      }
+      if (mode === 'verify') {
+        ['baseline','chaos','duplicates','lost'].forEach(id => document.querySelector(`#proof-${id}`).textContent = '-');
+        document.querySelector('#proof-clean').textContent = 'running';
+        document.querySelector('#proof-recovery').textContent = 'running';
+        document.querySelector('#proof-pass').textContent = 'pending';
+      }
+    }
+
+    function applySignal(mode, signal) {
+      if (!signal) return;
+      if (mode === 'flow' && signal === 'cluster') document.querySelector('#flow-badge').textContent = '3 workers online';
+      if (mode === 'flow' && signal === 'events') document.querySelector('#flow-badge').textContent = 'records flowing · workers processing';
+      if (mode === 'checkpoint' && signal.startsWith('prep')) document.querySelector('#checkpoint-prepared').textContent = `${signal.at(-1)} / 3`;
+      if (mode === 'checkpoint' && signal.startsWith('ack')) {
+        const index = Number(signal.at(-1));
+        document.querySelector('#checkpoint-acks').textContent = `${index + 1} / 3`;
+        document.querySelectorAll(`.object-key[data-object="${index}"],.object-key[data-object="${index + 3}"]`).forEach(el => el.classList.add('on'));
+      }
+      if (mode === 'checkpoint' && signal === 'commit') {
+        document.querySelector('.object-key[data-object="6"]').classList.add('on');
+        document.querySelector('#checkpoint-state').textContent = 'COMPLETED';
+      }
+      if (mode === 'recovery' && signal === 'kill') {
+        document.querySelector('#recovery-w0').classList.add('failed');
+        document.querySelector('#recovery-badge').textContent = 'worker w0 crash injected';
+      }
+      if (mode === 'recovery' && signal === 'dead') {
+        document.querySelector('#recovery-epoch').textContent = '2';
+        document.querySelector('#recovery-count').textContent = '2 / 3';
+        document.querySelector('#recovery-badge').textContent = 'rebalancing ownership';
+      }
+      if (mode === 'recovery' && signal === 'w1') document.querySelector('#recovery-w1 small').innerHTML = 'partitions [1 3 5]<br />32 buckets';
+      if (mode === 'recovery' && signal === 'w2') document.querySelector('#recovery-w2 small').innerHTML = 'partitions [0 2 4]<br />32 buckets';
+      if (mode === 'recovery' && signal === 'resumed') document.querySelector('#recovery-badge').textContent = 'processing resumed · checkpoint 6';
+      if (mode === 'verify' && signal === 'chaos') document.querySelector('#proof-chaos').textContent = '20,017';
+      if (mode === 'verify' && signal === 'duplicates') document.querySelector('#proof-duplicates').textContent = '0';
+      if (mode === 'verify' && signal === 'baseline') document.querySelector('#proof-baseline').textContent = '20,000';
+      if (mode === 'verify' && signal === 'clean') document.querySelector('#proof-clean').textContent = 'BIT-EXACT';
+      if (mode === 'verify' && signal === 'lost') {
+        document.querySelector('#proof-lost').textContent = '0';
+        document.querySelector('#proof-recovery').textContent = 'NO LOSS / 0 DUP WINDOWS';
+      }
+      if (mode === 'verify' && signal === 'pass') document.querySelector('#proof-pass').textContent = 'PASS';
+    }
+
+    async function appendTerminalLine(output, line) {
+      const el = document.createElement('div');
+      el.className = `term-line ${line.kind}`;
+      output.appendChild(el);
+      if (line.kind === 'command') {
+        const cursor = document.createElement('i');
+        cursor.className = 'cursor';
+        el.appendChild(cursor);
+        for (const char of line.text) {
+          cursor.before(char);
+          await sleep(8);
+        }
+        await sleep(120);
+        cursor.remove();
+      } else {
+        el.textContent = line.text;
+      }
+      output.scrollTop = output.scrollHeight;
+    }
+
+    async function playTerminal(mode) {
+      resetTerminal(mode);
+      const run = terminalRuns[mode];
+      const output = document.querySelector(`#${run.output}`);
+      for (const line of run.lines) {
+        await appendTerminalLine(output, line);
+        applySignal(mode, line.signal);
+        await sleep(line.kind === 'command' ? 180 : 330);
+      }
+    }
+
+    window.showScene=showScene; window.playTerminal=playTerminal; lucide.createIcons();
   </script>
 </body>
 </html>
