@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package streamforge;
+
+option go_package = "github.com/Mxs8513/StreamForge/internal/proto;proto";
+
+// Event is the input record. Phases 1-2 carry it as JSON on Kafka for
+// debuggability; this message becomes the wire format in Phase 3 alongside the
+// gRPC services below.
+message Event {
+  string event_id = 1;
+  string key = 2;
+  string event_type = 3;
+  double amount = 4;
+  int64 event_time = 5;
+  int64 ingest_time = 6;
+}
+
+// ---- Phase 3+ coordinator/worker control plane (declared now, wired later) ----
+
+message RegisterRequest { string worker_id = 1; string address = 2; }
+message RegisterResponse { Assignment assignment = 1; }
+
+message Assignment {
+  bool ready = 1;                       // false until the cluster has first formed
+  repeated int32 kafka_partitions = 2;  // Kafka partitions THIS worker consumes
+  repeated int32 key_buckets = 3;       // hash buckets THIS worker owns
+  int32 num_buckets = 4;                // total bucket space
+  // bucket_owner_addr[b] = shuffle address of the worker owning bucket b.
+  // The router uses this to decide local-vs-remote and to dial the owner.
+  repeated string bucket_owner_addr = 5;
+  int64 last_completed_checkpoint = 6;  // 0 until Phase 4
+  // epoch increments on every membership change (join/death). A worker that
+  // sees a higher epoch resets to the last checkpoint with the new assignment.
+  int64 epoch = 7;
+}
+
+message HeartbeatRequest { string worker_id = 1; }
+message HeartbeatResponse { bool reassigned = 1; Assignment assignment = 2; }
+
+// CheckpointBarrier identifies one checkpoint round (the aligned barrier).
+message CheckpointBarrier { int64 checkpoint_id = 1; }
+
+// CheckpointAck is a worker's response to CommitCheckpoint: its state snapshot
+// plus the offsets that snapshot corresponds to, captured together at the same
+// quiescent point so state and offsets advance as one unit.
+message CheckpointAck {
+  string worker_id = 1;
+  int64 checkpoint_id = 2;
+  map<int32, int64> kafka_offsets = 3; // partition -> next offset
+  string state_snapshot_uri = 4;
+  repeated string staged_outputs = 5;  // empty until Phase 6
+}
+message Empty {}
+
+message GetAssignmentRequest { string worker_id = 1; }
+
+// ShuffleRequest carries an event redirected to the worker that owns its key.
+message ShuffleRequest { Event event = 1; }
+
+service Coordinator {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc GetAssignment(GetAssignmentRequest) returns (Assignment);
+}
+
+service Worker {
+  // Phase 1 of the aligned barrier: pause sources, drain outbound shuffles.
+  rpc PrepareCheckpoint(CheckpointBarrier) returns (Empty);
+  // Phase 2: drain inbox into state, snapshot state+offsets, ack, then resume.
+  rpc CommitCheckpoint(CheckpointBarrier) returns (CheckpointAck);
+  rpc Shuffle(ShuffleRequest) returns (Empty);
+}

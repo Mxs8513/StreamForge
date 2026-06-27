@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 2s
+
+scrape_configs:
+  # Workers and coordinator run on the host (go run / binary). On macOS/Windows
+  # Docker, host.docker.internal resolves to the host from inside the container.
+  - job_name: streamforge-worker
+    static_configs:
+      - targets: ["host.docker.internal:2112", "host.docker.internal:2113", "host.docker.internal:2114"]
+  - job_name: streamforge-coordinator
+    static_configs:
+      - targets: ["host.docker.internal:2120"]
